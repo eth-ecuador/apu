@@ -1,6 +1,8 @@
-# Apu Sensible Data Guardian
+# Apu 
+## Sensible Data Guardian
 
-A decentralized platform for managing sensitive healthcare data while enabling privacy-preserving research for non-profit organizations. Combines client-side encryption, decentralized storage, and Fully Homomorphic Encryption (FHE) to protect patient records while allowing statistical analysis.
+A decentralized application for managing sensible health data of the beneficiaries of non-profit organizations while enabling privacy-preserving data availability. 
+Combines client-side encryption, decentralized storage and confidential smart contracts (FHE) to protect patient records while granular access granted by the data owner and encrypted data processing is available.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/e39e9438-c2d2-4224-8ed7-85fdd6a56708" alt="Apu Sensible Data Guardian" />
@@ -8,16 +10,15 @@ A decentralized platform for managing sensitive healthcare data while enabling p
 
 ## Features
 
-- **End-to-End Encryption**: Patient data encrypted client-side before transmissione
+- **End-to-End Encryption**: Patient data encrypted client-side before transmission
 - **Privacy-Preserving Analytics**: FHE enables computation on encrypted data without exposure
-- **Smart Contract Access Control**: Transparent permission management via Zama contracts
-- **Regulatory Compliance**: Built-in audit trails and compliance support
+- **Smart Contract Access Control**: Transparent permission management via confidential smart contracts
 
 ## Architecture
 
 ### Data Flow
 1. **Data Submission**: Patients encrypt records client-side before upload
-2. **Private Computation**: FHE performs calculations without decryption
+2. **Private Computation**: FHE performs computations and/or evaluations without decryption
 3. **Insight Generation**: Aggregated, anonymized results delivered to authorized parties
 4. **Access Control**: Smart contracts enforce granular permissions with audit trails
 
@@ -29,10 +30,10 @@ graph TB
     Frontend --> Wallet[Web3 Wallet Connection]
     Frontend --> Backend[API Backend]
     
-    Backend --> FHE[Zama FHE Analytics]
-    Backend --> Contracts[Zama Smart Contracts]
+    Backend --> FHE[FHE Analytics]
+    Backend --> Contracts[Confidential Smart Contracts]
     
-    Contracts --> Sepolia[Ethereum Sepolia]
+    Contracts --> EVM[EVM chain]
     
     FHE --> Results[Aggregated Results]
     Results --> Frontend
@@ -45,13 +46,13 @@ graph TB
     class Contracts storage
     class FHE,Results compute
 ```
-
+ene
 **Components:**
 - **Frontend**: React/Next.js with Web3 wallet connection
-- **Backend**: Solidity / Typescript
-- **Smart Contracts**: Ethereum Sepolia using Zama confidential contracts
-- **Storage**: FHE smart contracts for encrypted data
-- **Computation**: Zama FHE for off-chain analytics
+- **Backend**: Solidity / Python
+- **Smart Contracts**: EVM compatible chain using Smart Confidential Contracts
+- **Storage**: Standard S3 object storage (AWS or Minio)
+- **Computation**: FHE coproces for off-chain analytics
 
 ## Key Benefits
 
