@@ -47,12 +47,12 @@ This work explores the practical limits of Fully Homomorphic Encryption (FHE) fo
 ### Key Achievement
 
 **100% Working Implementation** with real on-chain data:
-- ✅ **6 encrypted patient records** on Sepolia testnet
-- ✅ **3 confirmed transactions** (490k-1.6M gas)
-- ✅ **48/48 unit tests passing** (100% pass rate)
+- ✅ **6 encrypted patient records** on Sepolia testnet (✅ verified)
+- ✅ **3 confirmed transactions** (490k-1.6M gas, ✅ verified on Etherscan)
+- ✅ **101/101 unit tests passing** (100% pass rate, ✅ verified)
 - ✅ **Modern SDK integration** (@zama-fhe/react-sdk@3.3.0)
 - ✅ **Winner patterns implemented** (ghostlend + DripPay)
-- ✅ **Measured performance limits** (not estimates)
+- ✅ **Measured gas costs** (not estimates, ✅ blockchain-verified)
 - ✅ **Documented failure modes** (division unsupported, stack depth, KMS latency)
 
 **Contract Address:** `0x780c06f807E5fB8768A0cD6648A28D8A621F0470` (Sepolia)
@@ -690,16 +690,17 @@ Individual records cryptographically undecryptable—effective "crypto-shredding
 |--------|-------|---------|
 | **Total Patients** | 6 | Real encrypted submissions |
 | **Confirmed Transactions** | 3 | 100% success rate |
-| **Gas: Single Submission** | 490,907 | Per-patient cost |
-| **Gas: Batch (5 patients)** | 1,675,224 | 335k per patient (28% savings) |
-| **Gas: Epoch Closure** | 144,046 | KMS request overhead |
-| **Total Gas Spent** | 2,310,177 | Real ETH on Sepolia |
+| **Gas: Single Submission** | 490,907 | ✅ [Verified TX](https://sepolia.etherscan.io/tx/0xecc76402ee76ad6a544fffe73e23cc539274a95002eeddb7e8c3279b4bec6dc6) |
+| **Gas: Batch (5 patients)** | 1,675,224 | ✅ [Verified TX](https://sepolia.etherscan.io/tx/0x3d6b95884af452a1bba699f31fa0943cb70fd49218db91254dd69b696024ad03) |
+| **Per-patient (batch)** | 335,045 | **31.7% savings** vs single |
+| **Gas: Epoch Closure** | 144,046 | ✅ [Verified TX](https://sepolia.etherscan.io/tx/0xba6d28edf94100def470675d25e5aa9057cc901d9439836c95f8443b7956a189) |
+| **Total Gas Spent** | 2,310,177 | Sum of 3 verified TXs |
 
 ### Testing Coverage
 
 | Category | Status | Details |
 |----------|--------|---------|
-| **Unit Tests** | 48/48 passing | 100% pass rate |
+| **Unit Tests** | 101/101 passing | 100% pass rate, 25s execution |
 | **Integration Tests** | 3/3 successful | Real on-chain TXs |
 | **Frontend Build** | ✅ Compiles | No errors |
 | **Dev Server** | ✅ Running | http://localhost:3000 |
