@@ -2,11 +2,11 @@
 pragma solidity ^0.8.24;
 
 import {FHE, euint8, euint32, ebool, externalEuint8, externalEuint32} from "@fhevm/solidity/lib/FHE.sol";
-import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
+import {ZamaEthereumConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 
 /// @title MedicalRecords - Contract for storing encrypted medical data with public statistics
 /// @notice Allows foundations to register and manage medical records with statistical analysis
-contract MedicalRecords is SepoliaConfig {
+contract MedicalRecords is ZamaEthereumConfig {
     
     struct Patient {
         string name;                    // Public name (non-sensitive)
