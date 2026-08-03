@@ -12,6 +12,7 @@
  * 2. Get testnet 0G from: https://faucet.0g.ai
  */
 
+import "dotenv/config";
 import { OGComputeService } from "./services/og-compute.service.js";
 
 async function testCompute() {

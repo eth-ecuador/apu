@@ -12,6 +12,7 @@
  * 2. Get testnet 0G from: https://faucet.0g.ai
  */
 
+import "dotenv/config";
 import { OGStorageService } from "./services/og-storage.service.js";
 import { randomBytes } from "crypto";
 

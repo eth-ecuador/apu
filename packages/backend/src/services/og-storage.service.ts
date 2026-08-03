@@ -42,12 +42,13 @@ export class OGStorageService {
   private indexer: Indexer;
   private provider: JsonRpcProvider;
   private wallet: Wallet;
-  private uploader: Uploader;
+  private uploader: Uploader | null = null;
   private pendingUploadsDir: string;
+  private rpcUrl: string;
 
   constructor() {
     const indexerUrl = process.env.OG_INDEXER_URL || "https://indexer-storage-testnet-turbo.0g.ai";
-    const rpcUrl = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
+    this.rpcUrl = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
     const privateKey = process.env.OG_DEPLOYER_PRIVATE_KEY;
 
     if (!privateKey) {
@@ -55,13 +56,35 @@ export class OGStorageService {
     }
 
     this.indexer = new Indexer(indexerUrl);
-    this.provider = new JsonRpcProvider(rpcUrl);
+    this.provider = new JsonRpcProvider(this.rpcUrl);
     this.wallet = new Wallet(privateKey, this.provider);
-    this.uploader = new Uploader(indexerUrl, this.provider, this.wallet);
     this.pendingUploadsDir = join(process.cwd(), ".pending-uploads");
 
     // Ensure pending uploads directory exists
     mkdir(this.pendingUploadsDir, { recursive: true }).catch(() => {});
+  }
+
+  /**
+   * Get or create uploader (lazy initialization)
+   */
+  private async getUploader(): Promise<Uploader> {
+    if (this.uploader) {
+      return this.uploader;
+    }
+
+    // Create uploader from indexer nodes (SDK 1.2.10 pattern)
+    const [uploader, error] = await this.indexer.newUploaderFromIndexerNodes(
+      this.rpcUrl,
+      this.wallet,
+      1  // expectedReplica
+    );
+
+    if (error || !uploader) {
+      throw new Error(`Failed to create uploader: ${error?.message || "Unknown error"}`);
+    }
+
+    this.uploader = uploader;
+    return this.uploader;
   }
 
   /**
@@ -133,12 +156,15 @@ export class OGStorageService {
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     try {
-      // 1. Encrypt data
+      // 1. Get uploader (lazy init)
+      const uploader = await this.getUploader();
+
+      // 2. Encrypt data
       const encrypted = this.encryptJson(params.data, params.key);
       const file = new MemData(encrypted);
 
-      // 2. Upload with timeout protection
-      const uploadPromise = this.uploader.upload(file);
+      // 3. Upload with timeout protection (SDK 1.2.10 uses uploadFile)
+      const uploadPromise = uploader.uploadFile(file, {});
       const timeoutPromise = new Promise<never>((_, reject) => {
         timer = setTimeout(() => {
           reject(new Error("upload-timeout"));
@@ -148,18 +174,18 @@ export class OGStorageService {
       const [result, error] = await Promise.race([uploadPromise, timeoutPromise]);
 
       if (error) {
-        throw new Error(error);
+        throw error;
       }
 
-      // 3. Extract result
-      const merkleRoot = "rootHash" in result ? result.rootHash : result.rootHashes?.[0];
-      const txHash = "txHash" in result ? result.txHash : result.txHashes?.[0];
+      // 4. Extract result (SDK 1.2.10 format)
+      const merkleRoot = result.rootHash;
+      const txHash = result.txHash;
 
       if (!merkleRoot || !txHash) {
         throw new Error("Invalid upload result: missing merkleRoot or txHash");
       }
 
-      // 4. Wait for finalization (optional, with timeout)
+      // 5. Wait for finalization (optional, with timeout)
       let finalized = false;
       try {
         await this.waitForFinalization(merkleRoot);
