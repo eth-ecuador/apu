@@ -14,8 +14,16 @@
  * 5. Timeout protection on inference calls
  */
 
-import { createZGComputeNetworkBroker } from "@0gfoundation/0g-compute-ts-sdk";
+// ESM workaround for broken SDK export (pattern from AEGIS + 0run + Zerun + Heckle)
+// The SDK's ESM build is broken — importing it throws "does not provide an export
+// named 'C'" (verified against @0gfoundation/0g-compute-ts-sdk 0.9.0), so the
+// CommonJS build has to be loaded explicitly.
+import { createRequire } from "node:module";
+import type * as ZeroGComputeSdk from "@0gfoundation/0g-compute-ts-sdk";
 import { JsonRpcProvider, Wallet, verifyMessage } from "ethers";
+
+const require = createRequire(import.meta.url);
+const { createZGComputeNetworkBroker } = require("@0gfoundation/0g-compute-ts-sdk") as typeof ZeroGComputeSdk;
 
 // Timeout constants
 const INFERENCE_TIMEOUT_MS = 60_000;        // 1 minute per inference
