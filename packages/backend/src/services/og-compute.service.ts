@@ -61,6 +61,11 @@ export class OGComputeService {
 
   /**
    * Initialize broker (lazy initialization)
+   *
+   * Pattern from ALL winners (Anima, AEGIS, Turing Pits, Zerun, Heckle):
+   * - Check if ledger exists first
+   * - If exists: can top up with ANY amount (depositFund)
+   * - If not exists: MUST create with >= 3 0G (contract enforced)
    */
   private async getBroker() {
     if (this.broker) {
@@ -70,17 +75,55 @@ export class OGComputeService {
     console.log("[OGCompute] Creating broker...");
     this.broker = await createZGComputeNetworkBroker(this.wallet);
 
-    // Ensure ledger exists (minimum 3 0G enforced by SDK)
-    try {
-      await this.broker.ledger.getLedger();
-      console.log("[OGCompute] Ledger exists");
-    } catch {
-      console.log("[OGCompute] Creating ledger with 3 0G minimum...");
-      await this.broker.ledger.addLedger(3);
-      console.log("[OGCompute] Ledger created");
-    }
+    // Check wallet balance first
+    const balance = await this.provider.getBalance(await this.wallet.getAddress());
+    const balanceInOG = Number(balance) / 1e18;
+    console.log(`[OGCompute] Wallet balance: ${balanceInOG.toFixed(4)} 0G`);
 
-    return this.broker;
+    // Try to get existing ledger (pattern from Anima, AEGIS, Turing Pits)
+    try {
+      const ledger = await this.broker.ledger.getLedger();
+      console.log("[OGCompute] ✓ Existing ledger found");
+      console.log(`  Balance: ${ledger.balance} wei`);
+
+      // Check if needs top-up (pattern from Heckle: threshold = 0.5 0G)
+      const ledgerBalanceOG = Number(ledger.balance) / 1e18;
+      const topUpThreshold = 0.5;
+
+      if (ledgerBalanceOG < topUpThreshold && balanceInOG >= 0.5) {
+        // Top up with available balance (pattern from Zerun, Heckle)
+        const topUpAmount = Math.min(0.5, balanceInOG - 0.05); // Keep 0.05 for gas
+        console.log(`[OGCompute] Low ledger balance (${ledgerBalanceOG.toFixed(4)} 0G)`);
+        console.log(`[OGCompute] Topping up with ${topUpAmount.toFixed(4)} 0G...`);
+        await this.broker.ledger.depositFund(topUpAmount);
+        console.log("[OGCompute] ✓ Ledger topped up");
+      }
+
+      return this.broker;
+
+    } catch (error) {
+      // No ledger exists - must create with >= 3 0G (contract enforced)
+      console.log("[OGCompute] No ledger found, creating new one...");
+
+      const minLedger = 3; // SDK enforces 3 0G minimum (from Turing Pits line 300)
+
+      if (balanceInOG < minLedger) {
+        throw new Error(
+          `Insufficient balance for ledger creation.\n` +
+          `  Have: ${balanceInOG.toFixed(4)} 0G\n` +
+          `  Need: ${minLedger} 0G (contract minimum for first ledger)\n` +
+          `  Get testnet tokens: https://faucet.0g.ai\n` +
+          `\n` +
+          `NOTE: After first ledger is created, you can top up with ANY amount using depositFund()`
+        );
+      }
+
+      console.log(`[OGCompute] Creating ledger with ${minLedger} 0G...`);
+      await this.broker.ledger.addLedger(minLedger);
+      console.log("[OGCompute] ✓ Ledger created successfully");
+
+      return this.broker;
+    }
   }
 
   /**
