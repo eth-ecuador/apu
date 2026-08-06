@@ -1,0 +1,39 @@
+name: Deploy to Vercel on merge
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set environment variables in Vercel
+      - uses: dkershner6/vercel-set-env-action@v3
+        with:
+          token: ${{ secrets.VERCEL_TOKEN }}
+          projectName: apu-medical
+          envVariableKeys: NEXT_PUBLIC_PRIVY_APP_ID,NEXT_PUBLIC_SEPOLIA_RPC_URL,NEXT_PUBLIC_KMS_GATEWAY_URL
+        env:
+          NEXT_PUBLIC_PRIVY_APP_ID: ${{ secrets.NEXT_PUBLIC_PRIVY_APP_ID }}
+          TARGET_NEXT_PUBLIC_PRIVY_APP_ID: preview,development,production
+          TYPE_NEXT_PUBLIC_PRIVY_APP_ID: plain
+
+          NEXT_PUBLIC_SEPOLIA_RPC_URL: ${{ secrets.NEXT_PUBLIC_SEPOLIA_RPC_URL }}
+          TARGET_NEXT_PUBLIC_SEPOLIA_RPC_URL: preview,development,production
+          TYPE_NEXT_PUBLIC_SEPOLIA_RPC_URL: plain
+
+          NEXT_PUBLIC_KMS_GATEWAY_URL: ${{ secrets.NEXT_PUBLIC_KMS_GATEWAY_URL }}
+          TARGET_NEXT_PUBLIC_KMS_GATEWAY_URL: preview,development,production
+          TYPE_NEXT_PUBLIC_KMS_GATEWAY_URL: plain
+
+      # Deploy to Vercel
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-args: '--prod'
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./app
