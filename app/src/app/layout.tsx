@@ -24,14 +24,9 @@ export default function RootLayout({
           appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
           config={{
             loginMethods: ["email", "wallet"],
-            embeddedWallets: {
-              createOnLogin: "all-users",
-              showWalletLoginFirst: true
-            },
             appearance: {
               theme: "dark",
-              accentColor: "#06b6d4",
-              logo: "https://via.placeholder.com/150x50/0a0e1a/06b6d4?text=APU"
+              accentColor: "#06b6d4"
             }
           }}
         >
