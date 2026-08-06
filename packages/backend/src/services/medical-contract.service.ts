@@ -5,18 +5,7 @@
  * Pattern from fhevm-hardhat-template for production use
  */
 import { Contract, JsonRpcProvider, Wallet, TransactionReceipt } from "ethers";
-import { readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load ABI from compiled artifacts
-const ARTIFACT_PATH = join(
-  __dirname,
-  "../../../../fhevm-hardhat-template/artifacts/contracts/MedicalDataRegistry.sol/MedicalDataRegistry.json"
-);
+import { MEDICAL_REGISTRY_ABI } from "./medical-registry-abi.js";
 
 interface PatientRecord {
   encryptedRiskScore: bigint;
@@ -61,20 +50,9 @@ export class MedicalContractService {
       throw new Error("MEDICAL_REGISTRY_ADDRESS not set in environment");
     }
 
-    // Load ABI
-    let abi: unknown[];
-    try {
-      const artifact = JSON.parse(readFileSync(ARTIFACT_PATH, "utf8"));
-      abi = artifact.abi;
-    } catch (error) {
-      throw new Error(
-        `Failed to load contract ABI from ${ARTIFACT_PATH}: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
-
     this.provider = new JsonRpcProvider(rpcUrl);
     this.wallet = new Wallet(privateKey, this.provider);
-    this.contract = new Contract(this.contractAddress, abi, this.wallet);
+    this.contract = new Contract(this.contractAddress, MEDICAL_REGISTRY_ABI, this.wallet);
 
     console.log("[MedicalContract] ✓ Connected to MedicalDataRegistry");
     console.log(`[MedicalContract]   Address: ${this.contractAddress}`);
