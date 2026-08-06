@@ -162,12 +162,57 @@ app.post("/api/patient/submit", async (req: Request, res: Response) => {
 // API endpoint: Run AI diagnosis
 // POST /api/diagnosis/run
 // Body: { patientAddress: string, symptoms: string, medicalHistory: object }
-// TODO: Implement runMedicalDiagnosis and verifyTEESignature in OGComputeService
 app.post("/api/diagnosis/run", async (req: Request, res: Response) => {
-  res.status(501).json({
-    error: "Not implemented yet",
-    message: "AI diagnosis endpoint will be available in next version"
-  });
+  const startTime = Date.now();
+
+  try {
+    const { patientAddress, symptoms, medicalHistory } = req.body;
+
+    if (!patientAddress || !symptoms) {
+      res.status(400).json({ error: "Missing required fields: patientAddress, symptoms" });
+      return;
+    }
+
+    console.log("[API] Running AI diagnosis...");
+    console.log(`[API]   Patient: ${patientAddress}`);
+    console.log(`[API]   Symptoms: ${symptoms}`);
+
+    // Run AI inference via 0G Compute with TEE
+    const diagnosisResult = await computeService.runDiagnosisInference({
+      symptoms,
+      medicalHistory: medicalHistory || {},
+    });
+
+    if ("error" in diagnosisResult) {
+      throw new Error(`AI diagnosis failed: ${diagnosisResult.error}`);
+    }
+
+    const { diagnosis, confidence, verificationComponents, timestamp } = diagnosisResult.ok;
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+    console.log(`[API] ✓ AI diagnosis completed (${elapsed}s)`);
+    console.log(`[API]   Diagnosis: ${diagnosis.substring(0, 100)}...`);
+    console.log(`[API]   Confidence: ${confidence}%`);
+    console.log(`[API]   TEE Verified: ${verificationComponents.zgTeeVerified}`);
+
+    res.json({
+      success: true,
+      data: {
+        patientAddress,
+        diagnosis,
+        confidence,
+        teeSignature: verificationComponents.zgTeeSignature,
+        teeVerified: verificationComponents.zgTeeVerified,
+        verificationComponents,
+        timestamp,
+      },
+      elapsed: `${elapsed}s`,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[API] ✗ Diagnosis failed:", errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
 });
 
 // API endpoint: Store diagnosis in contract
