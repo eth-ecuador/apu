@@ -162,70 +162,12 @@ app.post("/api/patient/submit", async (req: Request, res: Response) => {
 // API endpoint: Run AI diagnosis
 // POST /api/diagnosis/run
 // Body: { patientAddress: string, symptoms: string, medicalHistory: object }
+// TODO: Implement runMedicalDiagnosis and verifyTEESignature in OGComputeService
 app.post("/api/diagnosis/run", async (req: Request, res: Response) => {
-  const startTime = Date.now();
-
-  try {
-    const { patientAddress, symptoms, medicalHistory } = req.body;
-
-    if (!patientAddress || !symptoms) {
-      res.status(400).json({ error: "Missing required fields: patientAddress, symptoms" });
-      return;
-    }
-
-    console.log("[API] Running AI diagnosis...");
-    console.log(`[API]   Patient: ${patientAddress}`);
-    console.log(`[API]   Symptoms: ${symptoms}`);
-
-    // Run AI inference via 0G Compute with TEE
-    const diagnosisResult = await computeService.runMedicalDiagnosis({
-      patientId: patientAddress,
-      symptoms,
-      medicalHistory: medicalHistory || {},
-    });
-
-    if ("error" in diagnosisResult) {
-      throw new Error(`AI diagnosis failed: ${diagnosisResult.error}`);
-    }
-
-    const { diagnosis, confidence, teeSignature, txHash } = diagnosisResult.ok;
-
-    // Verify TEE signature
-    const isValid = await computeService.verifyTEESignature(
-      {
-        patientId: patientAddress,
-        diagnosis,
-        confidence,
-      },
-      teeSignature
-    );
-
-    if (!isValid) {
-      throw new Error("TEE signature verification failed");
-    }
-
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-    console.log(`[API] ✓ AI diagnosis completed (${elapsed}s)`);
-    console.log(`[API]   Diagnosis: ${diagnosis}`);
-    console.log(`[API]   Confidence: ${confidence}%`);
-
-    res.json({
-      success: true,
-      data: {
-        patientAddress,
-        diagnosis,
-        confidence,
-        teeSignature,
-        teeVerified: isValid,
-        txHash,
-      },
-      elapsed: `${elapsed}s`,
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[API] ✗ Diagnosis failed:", errorMessage);
-    res.status(500).json({ error: errorMessage });
-  }
+  res.status(501).json({
+    error: "Not implemented yet",
+    message: "AI diagnosis endpoint will be available in next version"
+  });
 });
 
 // API endpoint: Store diagnosis in contract
@@ -298,7 +240,7 @@ app.post("/api/diagnosis/store", async (req: Request, res: Response) => {
 // GET /api/patient/:address
 app.get("/api/patient/:address", async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
+    const address = req.params.address as string;
 
     console.log("[API] Fetching patient record...");
     console.log(`[API]   Patient: ${address}`);
@@ -352,7 +294,7 @@ app.post("/api/storage/download", async (req: Request, res: Response) => {
     console.log(`[API]   Merkle Root: ${merkleRoot}`);
 
     const key = Buffer.from(encryptionKey, "hex");
-    const downloadResult = await storageService.downloadDecrypted(merkleRoot, key);
+    const downloadResult = await storageService.downloadAndDecrypt({ merkleRoot, key });
 
     if ("error" in downloadResult) {
       throw new Error(`Download failed: ${downloadResult.error}`);

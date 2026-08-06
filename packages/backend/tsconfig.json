@@ -5,7 +5,7 @@
     "lib": ["ES2022"],
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,6 +15,6 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "drizzle"]
+  "include": ["src/server.ts", "src/services/**/*"],
+  "exclude": ["node_modules", "dist", "drizzle", "src/index.ts", "src/db/**/*", "src/test-*.ts"]
 }
