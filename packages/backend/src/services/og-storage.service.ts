@@ -349,7 +349,7 @@ export class OGStorageService {
         return null;
       }
 
-      const nodesData = await nodesResponse.json();
+      const nodesData = await nodesResponse.json() as any;
       const nodes = nodesData.result || [];
 
       if (nodes.length === 0) {
@@ -373,7 +373,7 @@ export class OGStorageService {
             signal: AbortSignal.timeout(5000) // 5s probe timeout
           });
 
-          const infoData = await infoResponse.json();
+          const infoData = await infoResponse.json() as any;
           return { url, info: infoData.result };
         })
       );
@@ -407,7 +407,7 @@ export class OGStorageService {
             continue; // Try next candidate
           }
 
-          const downloadData = await downloadResponse.json();
+          const downloadData = await downloadResponse.json() as any;
           const segmentHex = downloadData.result;
 
           if (segmentHex) {

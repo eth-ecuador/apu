@@ -280,7 +280,7 @@ export class OGComputeService {
       }
 
       // Parse response
-      const result = await response.json();
+      const result = await response.json() as any;
       const diagnosis = result.choices?.[0]?.message?.content || "";
       const usage = result.usage || {};
 
@@ -358,7 +358,7 @@ export class OGComputeService {
 
       // Download signature
       const sigResponse = await fetch(link);
-      const sigData = await sigResponse.json();
+      const sigData = await sigResponse.json() as any;
 
       const envelope = sigData.text || "";  // reqHash:resHash:providerType:identity:tlsFingerprint
       const signature = sigData.signature || "";
