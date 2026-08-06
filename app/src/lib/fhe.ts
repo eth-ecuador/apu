@@ -1,53 +1,14 @@
-import { createFheClient } from "@zama-fhe/react-sdk";
-
-// FHE Client configuration for Sepolia
-export const fheConfig = {
-  networkUrl: process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com",
-  gatewayUrl: process.env.NEXT_PUBLIC_KMS_GATEWAY_URL || "https://gateway.sepolia.zama.dev",
-  chainId: 11155111
-};
-
-// Initialize FHE client
-export const fheClient = createFheClient(fheConfig);
-
 /**
- * Encrypt a number with FHE (client-side)
+ * Zama FHE SDK configuration
+ *
+ * Pattern from ghostlend (mainnet-s3 winner):
+ * - ZamaProvider wraps the app with dynamic config
+ * - Config is created in layout.tsx using wagmi clients
+ * - useEncrypt hook returns TanStack Query mutation
+ *
+ * Note: The actual config is created in layout.tsx using wagmi's
+ * publicClient and walletClient. This file only exports the helper.
  */
-export async function encryptNumber(value: number): Promise<{
-  encrypted: Uint8Array;
-  proof: Uint8Array;
-}> {
-  await fheClient.init();
-
-  const encrypted = await fheClient.encrypt({
-    value,
-    type: "uint32"
-  });
-
-  return {
-    encrypted: encrypted.data,
-    proof: encrypted.proof
-  };
-}
-
-/**
- * Request decryption from KMS Gateway (authorized only)
- */
-export async function requestDecryption(params: {
-  contractAddress: string;
-  encryptedValue: string;
-  signature: string;
-}): Promise<number> {
-  await fheClient.init();
-
-  const decrypted = await fheClient.decrypt({
-    contractAddress: params.contractAddress,
-    encryptedValue: params.encryptedValue,
-    signature: params.signature
-  });
-
-  return decrypted;
-}
 
 /**
  * Derive AES key from wallet signature (HKDF)

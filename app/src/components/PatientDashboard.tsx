@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
+import { useEncrypt } from "@zama-fhe/react-sdk";
 
 const BACKEND_URL = "https://apu-backend-7a8z.onrender.com";
 
@@ -17,6 +18,7 @@ interface PatientData {
 
 export function PatientDashboard() {
   const { user } = usePrivy();
+  const { mutateAsync: encrypt } = useEncrypt(); // Ghostlend pattern
   const [formData, setFormData] = useState<PatientData>({
     symptoms: "",
     medicalHistory: "",
@@ -40,17 +42,14 @@ export function PatientDashboard() {
     setEncrypting(true);
 
     try {
-      // Import and initialize FHE client
-      const { encryptNumber } = await import("../lib/fhe");
-
       // Calculate risk score from vital signs and symptoms
       const riskScore = calculateRiskScore(formData.vitalSigns, formData.symptoms);
 
-      // Encrypt risk score with FHE
-      const { encrypted, proof } = await encryptNumber(riskScore);
+      // Encrypt risk score with FHE (using Zama SDK hook)
+      const encryptedData = await encrypt(riskScore, "uint32");
 
       // Show encrypted data preview
-      const encryptedHex = Buffer.from(encrypted).toString("hex");
+      const encryptedHex = encryptedData.data;
       setEncryptedPreview(encryptedHex.substring(0, 64));
       setEncrypting(false);
 
@@ -60,8 +59,8 @@ export function PatientDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientAddress: user?.wallet?.address || user?.email?.address,
-          encryptedRiskScore: "0x" + encryptedHex,
-          proof: "0x" + Buffer.from(proof).toString("hex"),
+          encryptedRiskScore: encryptedData.data,
+          proof: encryptedData.proof,
           symptoms: formData.symptoms,
           vitalSigns: formData.vitalSigns,
           medicalData: {
