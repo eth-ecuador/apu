@@ -1,0 +1,30 @@
+{
+  "name": "@apu/app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@privy-io/react-auth": "^3.35.2",
+    "@tanstack/react-query": "^5.62.0",
+    "@zama-fhe/react-sdk": "^3.3.0",
+    "next": "16.2.11",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "viem": "^2.55.0",
+    "wagmi": "^2.19.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5.7.0"
+  }
+}
