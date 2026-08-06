@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: apu-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install --legacy-peer-deps && cd packages/backend && npm run build
+    startCommand: cd packages/backend && node dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.5
+      - key: PORT
+        value: 3001
+      - key: DEPLOYER_PRIVATE_KEY
+        sync: false
+      - key: OG_DEPLOYER_PRIVATE_KEY
+        sync: false
+      - key: MEDICAL_REGISTRY_ADDRESS
+        value: 0x2819Cf40a952748014C56f393e1ffd16f4a377ff
+      - key: SEPOLIA_RPC_URL
+        value: https://ethereum-sepolia-rpc.publicnode.com
+      - key: OG_GALILEO_RPC_URL
+        value: https://evmrpc-testnet.0g.ai
+      - key: OG_RPC_URL
+        value: https://evmrpc-testnet.0g.ai
+      - key: OG_STORAGE_NODE_URL
+        value: https://rpc-storage-testnet.0g.ai
+      - key: OG_INDEXER_URL
+        value: https://indexer-storage-testnet-turbo.0g.ai
+      - key: NEXT_PUBLIC_KMS_GATEWAY_URL
+        value: https://gateway.sepolia.zama.dev
+      - key: NEXT_PUBLIC_SEPOLIA_RPC_URL
+        value: https://ethereum-sepolia-rpc.publicnode.com
