@@ -38,10 +38,11 @@ services:
   - type: web
     name: apu-frontend
     env: node
+    rootDir: app
     region: oregon
     plan: free
-    buildCommand: cd app && npm install --legacy-peer-deps && npm run build
-    startCommand: cd app && npm start
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: 20.19.5
