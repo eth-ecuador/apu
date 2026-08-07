@@ -41,7 +41,7 @@ services:
     rootDir: app
     region: oregon
     plan: free
-    buildCommand: npm install --legacy-peer-deps && npm run build
+    buildCommand: npm install --legacy-peer-deps && npm install @stripe/stripe-js@3.0.0 --legacy-peer-deps && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
