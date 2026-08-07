@@ -45,12 +45,18 @@ export function PatientDashboard() {
       // Calculate risk score from vital signs and symptoms
       const riskScore = calculateRiskScore(formData.vitalSigns, formData.symptoms);
 
-      // Encrypt risk score with FHE (using Zama SDK hook)
-      const encryptedData = await encrypt(riskScore, "uint32");
+      // Encrypt risk score with FHE (using Zama SDK hook - ghostlend pattern)
+      const encryptedData = await encrypt({
+        values: [
+          { value: BigInt(Math.floor(riskScore)), type: "euint32" }
+        ],
+        contractAddress: "0x2819Cf40a952748014C56f393e1ffd16f4a377ff" as `0x${string}`,
+        userAddress: (user?.wallet?.address || "0x0") as `0x${string}`
+      });
 
-      // Show encrypted data preview
-      const encryptedHex = encryptedData.data;
-      setEncryptedPreview(encryptedHex.substring(0, 64));
+      // Show encrypted data preview (using encryptedValues[0] from result)
+      const encryptedHex = encryptedData.encryptedValues[0] || encryptedData.inputProof;
+      setEncryptedPreview(String(encryptedHex).substring(0, 64));
       setEncrypting(false);
 
       // Submit to backend
@@ -59,8 +65,8 @@ export function PatientDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientAddress: user?.wallet?.address || user?.email?.address,
-          encryptedRiskScore: encryptedData.data,
-          proof: encryptedData.proof,
+          encryptedRiskScore: encryptedData.encryptedValues[0],
+          proof: encryptedData.inputProof,
           symptoms: formData.symptoms,
           vitalSigns: formData.vitalSigns,
           medicalData: {
