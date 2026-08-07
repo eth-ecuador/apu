@@ -4,7 +4,7 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "env": {
-    "NEXT_PUBLIC_PRIVY_APP_ID": "",
+    "NEXT_PUBLIC_PRIVY_APP_ID": "cmp777do400s60djx7sbqzwtp",
     "NEXT_PUBLIC_SEPOLIA_RPC_URL": "https://ethereum-sepolia-rpc.publicnode.com",
     "NEXT_PUBLIC_KMS_GATEWAY_URL": "https://gateway.sepolia.zama.dev"
   }

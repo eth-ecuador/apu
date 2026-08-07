@@ -1,4 +1,5 @@
 services:
+  # Backend API
   - type: web
     name: apu-backend
     env: node
@@ -32,3 +33,25 @@ services:
         value: https://gateway.sepolia.zama.dev
       - key: NEXT_PUBLIC_SEPOLIA_RPC_URL
         value: https://ethereum-sepolia-rpc.publicnode.com
+
+  # Frontend Next.js App
+  - type: web
+    name: apu-frontend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd app && npm install && npm run build
+    startCommand: cd app && npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.5
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_PRIVY_APP_ID
+        value: cmp777do400s60djx7sbqzwtp
+      - key: NEXT_PUBLIC_SEPOLIA_RPC_URL
+        value: https://ethereum-sepolia-rpc.publicnode.com
+      - key: NEXT_PUBLIC_KMS_GATEWAY_URL
+        value: https://gateway.sepolia.zama.dev
+      - key: NEXT_PUBLIC_BACKEND_URL
+        value: https://apu-backend-7a8z.onrender.com
