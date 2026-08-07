@@ -1,18 +1,23 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Instrument+Serif:ital,wght@0,400;0,600;1,400&display=swap');
 
-@theme {
-  /* Medical Cyberpunk Color System */
-  --color-cyber-navy: #0a0e1a;
-  --color-cyber-navy-light: #141827;
-  --color-cyber-blue: #0ea5e9;
-  --color-cyber-cyan: #06b6d4;
-  --color-medical-green: #10b981;
-  --color-danger-red: #ef4444;
-  --color-warning-amber: #f59e0b;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
+@layer base {
+  :root {
+    /* Medical Cyberpunk Color System */
+    --color-cyber-navy: #0a0e1a;
+    --color-cyber-navy-light: #141827;
+    --color-cyber-blue: #0ea5e9;
+    --color-cyber-cyan: #06b6d4;
+    --color-medical-green: #10b981;
+    --color-danger-red: #ef4444;
+    --color-warning-amber: #f59e0b;
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #94a3b8;
+    --color-text-muted: #64748b;
+  }
 }
 
 * {
