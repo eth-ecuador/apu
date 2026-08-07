@@ -2,148 +2,209 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Instrument+Serif:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @layer base {
   :root {
-    /* Medical Cyberpunk Color System */
-    --color-cyber-navy: #0a0e1a;
-    --color-cyber-navy-light: #141827;
-    --color-cyber-blue: #0ea5e9;
-    --color-cyber-cyan: #06b6d4;
-    --color-medical-green: #10b981;
-    --color-danger-red: #ef4444;
-    --color-warning-amber: #f59e0b;
-    --color-text-primary: #f8fafc;
-    --color-text-secondary: #94a3b8;
-    --color-text-muted: #64748b;
+    /* Clinical Precision Color System - Inspired by modern surgical environments */
+    --color-midnight-navy: #0A1628;
+    --color-surgical-blue: #1E3A5F;
+    --color-sterile-teal: #14B8A6;
+    --color-crypto-cyan: #06B6D4;
+    --color-clinical-white: #F1F5F9;
+    --color-muted-slate: #94A3B8;
+    --color-danger-red: #EF4444;
+    --color-success-green: #10B981;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--color-midnight-navy);
+    color: var(--color-clinical-white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-* {
-  box-sizing: border-box;
-}
+/* Subtle Grid Background - Clinical feel */
+@layer components {
+  .clinical-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      linear-gradient(rgba(20, 184, 166, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20, 184, 166, 0.02) 1px, transparent 1px);
+    background-size: 64px 64px;
+    z-index: 0;
+    pointer-events: none;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  /* Encryption Flow Animation - Signature element */
+  .encryption-flow {
+    position: relative;
+    overflow: hidden;
+  }
 
-body {
-  margin: 0;
-  font-family: 'Instrument Serif', Georgia, serif;
-  background: var(--color-cyber-navy);
-  color: var(--color-text-primary);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  .encryption-flow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(20, 184, 166, 0.15),
+      rgba(6, 182, 212, 0.15),
+      transparent
+    );
+    animation: encryption-scan 3s ease-in-out infinite;
+  }
 
-/* Animated Background Grid */
-.cyber-grid {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-  z-index: 0;
-  pointer-events: none;
-  animation: grid-scroll 20s linear infinite;
-}
+  @keyframes encryption-scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
 
-@keyframes grid-scroll {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
-}
+  /* Tech Stack Cards - Minimal bordered style */
+  .tech-card {
+    background: rgba(30, 58, 95, 0.3);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
 
-/* Encryption Visualization */
-.encryption-pulse {
-  position: relative;
-  overflow: hidden;
-}
+  .tech-card:hover {
+    border-color: rgba(20, 184, 166, 0.5);
+    background: rgba(30, 58, 95, 0.5);
+    transform: translateY(-2px);
+  }
 
-.encryption-pulse::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2), transparent);
-  animation: encryption-scan 2s infinite;
-}
+  /* Portal Buttons - Clean, professional */
+  .portal-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
 
-@keyframes encryption-scan {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
+  .portal-button-primary {
+    background: var(--color-sterile-teal);
+    border-color: var(--color-sterile-teal);
+    color: var(--color-midnight-navy);
+  }
 
-/* TEE Badge */
-.tee-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 0.5rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.875rem;
-  color: var(--color-medical-green);
-}
+  .portal-button-primary:hover {
+    background: var(--color-crypto-cyan);
+    border-color: var(--color-crypto-cyan);
+  }
 
-.tee-badge::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-medical-green);
-  box-shadow: 0 0 10px var(--color-medical-green);
-  animation: pulse-glow 2s infinite;
-}
+  .portal-button-secondary {
+    background: transparent;
+    border-color: var(--color-muted-slate);
+    color: var(--color-clinical-white);
+  }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
+  .portal-button-secondary:hover {
+    border-color: var(--color-clinical-white);
+    background: rgba(148, 163, 184, 0.1);
+  }
 
-/* Loading Animation */
-.loading-dots {
-  display: inline-flex;
-  gap: 0.25rem;
-}
+  /* Status Badge - Medical precision */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    border-radius: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    color: var(--color-sterile-teal);
+  }
 
-.loading-dots span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-cyber-cyan);
-  animation: loading-bounce 1.4s infinite ease-in-out both;
-}
+  .status-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-sterile-teal);
+    box-shadow: 0 0 8px var(--color-sterile-teal);
+    animation: pulse-glow 2s infinite;
+  }
 
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
 
-@keyframes loading-bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
-}
+  /* Data Visualization - Clean and precise */
+  .data-card {
+    background: rgba(30, 58, 95, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+  }
 
-/* Fade-in Animations */
-.fade-in { animation: fadeIn 0.6s ease-out; }
-.fade-in-delay-1 { animation: fadeIn 0.6s ease-out 0.1s both; }
-.fade-in-delay-2 { animation: fadeIn 0.6s ease-out 0.2s both; }
-.fade-in-delay-3 { animation: fadeIn 0.6s ease-out 0.3s both; }
+  /* Loading State */
+  .loading-dots {
+    display: inline-flex;
+    gap: 0.25rem;
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  .loading-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-crypto-cyan);
+    animation: loading-bounce 1.4s infinite ease-in-out both;
+  }
+
+  .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+  .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+  @keyframes loading-bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
+
+  /* Fade-in Animations - Subtle */
+  .fade-in { animation: fadeIn 0.5s ease-out; }
+  .fade-in-delay-1 { animation: fadeIn 0.5s ease-out 0.1s both; }
+  .fade-in-delay-2 { animation: fadeIn 0.5s ease-out 0.2s both; }
+  .fade-in-delay-3 { animation: fadeIn 0.5s ease-out 0.3s both; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }
 
 ::selection {
-  background: rgba(6, 182, 212, 0.3);
-  color: var(--color-text-primary);
+  background: rgba(20, 184, 166, 0.3);
+  color: var(--color-clinical-white);
 }
