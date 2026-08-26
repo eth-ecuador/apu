@@ -360,9 +360,15 @@ export class MedicalContractService {
     try {
       console.log("[MedicalContract] Fetching all patients from events...");
 
+      // Get current block and calculate safe range (max 50k blocks for public RPCs)
+      const currentBlock = await this.provider.getBlockNumber();
+      const fromBlock = Math.max(0, currentBlock - 49000); // Safe margin below 50k
+
+      console.log(`[MedicalContract] Querying events from block ${fromBlock} to ${currentBlock}`);
+
       // Query PatientDataSubmitted events
       const filter = this.contract.filters.PatientDataSubmitted();
-      const events = await this.contract.queryFilter(filter);
+      const events = await this.contract.queryFilter(filter, fromBlock, currentBlock);
 
       // Extract unique patient addresses
       const patients = [...new Set(events.map((event: any) => event.args.patient))];
@@ -385,9 +391,15 @@ export class MedicalContractService {
     try {
       console.log("[MedicalContract] Fetching all diagnoses from events...");
 
+      // Get current block and calculate safe range (max 50k blocks for public RPCs)
+      const currentBlock = await this.provider.getBlockNumber();
+      const fromBlock = Math.max(0, currentBlock - 49000); // Safe margin below 50k
+
+      console.log(`[MedicalContract] Querying diagnosis events from block ${fromBlock} to ${currentBlock}`);
+
       // Query DiagnosisStored events
       const filter = this.contract.filters.DiagnosisStored();
-      const events = await this.contract.queryFilter(filter);
+      const events = await this.contract.queryFilter(filter, fromBlock, currentBlock);
 
       const diagnoses = events.map((event: any) => ({
         patient: event.args.patient,
