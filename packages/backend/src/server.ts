@@ -383,6 +383,240 @@ app.get("/api/stats", async (req: Request, res: Response) => {
   }
 });
 
+// ===== NEW ENDPOINTS FOR PATIENT & DOCTOR PORTALS =====
+
+// API endpoint: Get patient diagnoses
+// GET /api/patient/diagnoses?address=0x...
+app.get("/api/patient/diagnoses", async (req: Request, res: Response) => {
+  try {
+    const address = req.query.address as string;
+
+    if (!address) {
+      res.status(400).json({ error: "Missing required parameter: address" });
+      return;
+    }
+
+    console.log("[API] Fetching patient diagnoses...");
+    console.log(`[API]   Patient: ${address}`);
+
+    // Get patient record
+    const record = await contractService.getPatientRecord(address);
+
+    if (!record.hasData) {
+      res.json({ success: true, diagnoses: [] });
+      return;
+    }
+
+    // Build diagnosis object
+    const diagnoses = [];
+
+    if (record.diagnosed) {
+      diagnoses.push({
+        id: `${address}-${record.diagnosedAt}`,
+        date: new Date(Number(record.diagnosedAt) * 1000).toISOString(),
+        symptoms: "Encrypted - requires decryption", // Would need 0G Storage download
+        riskScore: 0, // FHE encrypted, can't read directly
+        status: "completed",
+        encryptedData: {
+          riskScore: record.encryptedRiskScore.toString(),
+          diagnosis: record.encryptedDiagnosis.toString(),
+        },
+        ogStorageRoot: record.ogStorageRoot,
+        teeSignature: record.teeSignature,
+      });
+    }
+
+    console.log(`[API] ✓ Found ${diagnoses.length} diagnoses`);
+
+    res.json({
+      success: true,
+      diagnoses,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[API] ✗ Fetch diagnoses failed:", errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+// API endpoint: Get patient summary
+// GET /api/patient/summary?address=0x...
+app.get("/api/patient/summary", async (req: Request, res: Response) => {
+  try {
+    const address = req.query.address as string;
+
+    if (!address) {
+      res.status(400).json({ error: "Missing required parameter: address" });
+      return;
+    }
+
+    console.log("[API] Fetching patient summary...");
+    console.log(`[API]   Patient: ${address}`);
+
+    const record = await contractService.getPatientRecord(address);
+
+    const summary = {
+      totalDiagnoses: record.diagnosed ? 1 : 0,
+      lastDiagnosis: record.diagnosed
+        ? new Date(Number(record.diagnosedAt) * 1000).toISOString()
+        : null,
+      riskLevel: "low", // Would calculate from decrypted data
+      hasData: record.hasData,
+    };
+
+    res.json({
+      success: true,
+      summary,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[API] ✗ Fetch summary failed:", errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+// API endpoint: Get all patients (for doctor)
+// GET /api/doctor/patients
+app.get("/api/doctor/patients", async (req: Request, res: Response) => {
+  try {
+    console.log("[API] Fetching all patients...");
+
+    // Get all patient addresses from events
+    const patientAddresses = await contractService.getAllPatients();
+
+    // Fetch record for each patient
+    const patients = await Promise.all(
+      patientAddresses.map(async (address) => {
+        try {
+          const record = await contractService.getPatientRecord(address);
+
+          return {
+            address,
+            lastSubmission: new Date(Number(record.submittedAt) * 1000).toISOString(),
+            diagnosesCount: record.diagnosed ? 1 : 0,
+            pendingCount: record.hasData && !record.diagnosed ? 1 : 0,
+            riskLevel: "medium" as const, // Would calculate from data
+            hasData: record.hasData,
+            diagnosed: record.diagnosed,
+          };
+        } catch (err) {
+          console.error(`[API] Error fetching record for ${address}:`, err);
+          return null;
+        }
+      })
+    );
+
+    // Filter out nulls
+    const validPatients = patients.filter((p) => p !== null);
+
+    console.log(`[API] ✓ Found ${validPatients.length} patients`);
+
+    res.json({
+      success: true,
+      patients: validPatients,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[API] ✗ Fetch patients failed:", errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+// API endpoint: Get all diagnoses (for doctor)
+// GET /api/doctor/diagnoses
+app.get("/api/doctor/diagnoses", async (req: Request, res: Response) => {
+  try {
+    console.log("[API] Fetching all diagnoses...");
+
+    // Get all diagnosis events
+    const diagnosisEvents = await contractService.getAllDiagnoses();
+
+    // Fetch full record for each diagnosis
+    const diagnoses = await Promise.all(
+      diagnosisEvents.map(async (event) => {
+        try {
+          const record = await contractService.getPatientRecord(event.patient);
+
+          return {
+            id: `${event.patient}-${event.timestamp}`,
+            patientAddress: event.patient,
+            date: new Date(event.timestamp * 1000).toISOString(),
+            symptoms: "Encrypted - requires decryption",
+            riskScore: 0, // FHE encrypted
+            status: "completed" as const,
+            encryptedData: {
+              riskScore: record.encryptedRiskScore.toString(),
+              diagnosis: record.encryptedDiagnosis.toString(),
+            },
+            ogStorageRoot: record.ogStorageRoot,
+            teeSignature: record.teeSignature,
+          };
+        } catch (err) {
+          console.error(`[API] Error fetching diagnosis for ${event.patient}:`, err);
+          return null;
+        }
+      })
+    );
+
+    // Filter out nulls
+    const validDiagnoses = diagnoses.filter((d) => d !== null);
+
+    console.log(`[API] ✓ Found ${validDiagnoses.length} diagnoses`);
+
+    res.json({
+      success: true,
+      diagnoses: validDiagnoses,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[API] ✗ Fetch diagnoses failed:", errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+// API endpoint: Get doctor stats
+// GET /api/doctor/stats
+app.get("/api/doctor/stats", async (req: Request, res: Response) => {
+  try {
+    console.log("[API] Fetching doctor stats...");
+
+    const [patients, diagnoses, contractStats] = await Promise.all([
+      contractService.getAllPatients(),
+      contractService.getAllDiagnoses(),
+      contractService.getStats(),
+    ]);
+
+    // Count pending (patients with data but no diagnosis)
+    const patientRecords = await Promise.all(
+      patients.map((addr) => contractService.getPatientRecord(addr))
+    );
+
+    const pendingCount = patientRecords.filter(
+      (r) => r.hasData && !r.diagnosed
+    ).length;
+
+    // Count completed today
+    const today = new Date().setHours(0, 0, 0, 0) / 1000;
+    const completedToday = diagnoses.filter((d) => d.timestamp >= today).length;
+
+    const stats = {
+      totalPatients: patients.length,
+      pendingDiagnoses: pendingCount,
+      completedToday,
+      totalDiagnosesAllTime: Number(contractStats.totalDiagnoses),
+    };
+
+    res.json({
+      success: true,
+      stats,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[API] ✗ Fetch stats failed:", errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("[Server] Unhandled error:", err);
@@ -402,6 +636,11 @@ app.listen(PORT, () => {
   console.log(`  POST /api/diagnosis/run            - Run AI diagnosis`);
   console.log(`  POST /api/diagnosis/store          - Store diagnosis in contract`);
   console.log(`  GET  /api/patient/:address         - Get patient record`);
+  console.log(`  GET  /api/patient/diagnoses        - Get patient diagnoses list`);
+  console.log(`  GET  /api/patient/summary          - Get patient summary stats`);
+  console.log(`  GET  /api/doctor/patients          - Get all patients (doctor)`);
+  console.log(`  GET  /api/doctor/diagnoses         - Get all diagnoses (doctor)`);
+  console.log(`  GET  /api/doctor/stats             - Get doctor dashboard stats`);
   console.log(`  POST /api/storage/download         - Download from 0G Storage`);
   console.log(`  GET  /api/stats                    - Get contract stats`);
   console.log("\nIntegrations:");

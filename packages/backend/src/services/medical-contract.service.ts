@@ -349,4 +349,58 @@ export class MedicalContractService {
   getWalletAddress(): string {
     return this.wallet.address;
   }
+
+  /**
+   * Get all patient addresses who have submitted data
+   * Uses PatientDataSubmitted events to find all patients
+   *
+   * @returns Array of patient addresses
+   */
+  async getAllPatients(): Promise<string[]> {
+    try {
+      console.log("[MedicalContract] Fetching all patients from events...");
+
+      // Query PatientDataSubmitted events
+      const filter = this.contract.filters.PatientDataSubmitted();
+      const events = await this.contract.queryFilter(filter);
+
+      // Extract unique patient addresses
+      const patients = [...new Set(events.map((event: any) => event.args.patient))];
+
+      console.log(`[MedicalContract] ✓ Found ${patients.length} patients`);
+      return patients;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("[MedicalContract] ✗ Get all patients failed:", errorMessage);
+      throw new Error(`Failed to get all patients: ${errorMessage}`);
+    }
+  }
+
+  /**
+   * Get all diagnoses (DiagnosisStored events)
+   *
+   * @returns Array of diagnosis events with patient, doctor, and timestamp
+   */
+  async getAllDiagnoses(): Promise<Array<{patient: string, doctor: string, timestamp: number}>> {
+    try {
+      console.log("[MedicalContract] Fetching all diagnoses from events...");
+
+      // Query DiagnosisStored events
+      const filter = this.contract.filters.DiagnosisStored();
+      const events = await this.contract.queryFilter(filter);
+
+      const diagnoses = events.map((event: any) => ({
+        patient: event.args.patient,
+        doctor: event.args.doctor,
+        timestamp: Number(event.args.timestamp),
+      }));
+
+      console.log(`[MedicalContract] ✓ Found ${diagnoses.length} diagnoses`);
+      return diagnoses;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("[MedicalContract] ✗ Get all diagnoses failed:", errorMessage);
+      throw new Error(`Failed to get all diagnoses: ${errorMessage}`);
+    }
+  }
 }
