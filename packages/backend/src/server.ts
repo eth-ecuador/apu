@@ -282,8 +282,8 @@ app.post("/api/diagnosis/store", async (req: Request, res: Response) => {
 });
 
 // API endpoint: Get patient record
-// GET /api/patient/:address
-app.get("/api/patient/:address", async (req: Request, res: Response) => {
+// GET /api/patient/record/:address
+app.get("/api/patient/record/:address", async (req: Request, res: Response) => {
   try {
     const address = req.params.address as string;
 
