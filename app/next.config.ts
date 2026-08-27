@@ -15,6 +15,24 @@ const nextConfig: NextConfig = {
     };
 
     return config;
+  },
+  // Configure headers for Privy auth and wallet connections
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "frame-ancestors 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org",
+              "frame-src 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org",
+              "connect-src 'self' https://auth.privy.io https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org https://ethereum-sepolia-rpc.publicnode.com https://evmrpc-testnet.0g.ai wss://*.walletconnect.com wss://*.walletconnect.org"
+            ].join('; ')
+          }
+        ]
+      }
+    ];
   }
 };
 

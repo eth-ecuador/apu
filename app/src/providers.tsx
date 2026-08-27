@@ -68,7 +68,23 @@ export function Providers({ children }: { children: ReactNode }) {
         loginMethods: ["email", "wallet"],
         appearance: {
           theme: "dark",
-          accentColor: "#06b6d4"
+          accentColor: "#14B8A6",
+          logo: "https://apu-frontend.onrender.com/logo.png"
+        },
+        // Enable embedded wallets
+        embeddedWallets: {
+          createOnLogin: "users-without-wallets",
+          noPromptOnSignature: false
+        },
+        // Default chain
+        defaultChain: viemSepolia,
+        // Support Sepolia
+        supportedChains: [viemSepolia],
+        // External wallets (MetaMask, Rabby, etc)
+        externalWallets: {
+          coinbaseWallet: {
+            connectionOptions: "all"
+          }
         }
       }}
     >
