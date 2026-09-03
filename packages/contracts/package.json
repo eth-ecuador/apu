@@ -1,0 +1,40 @@
+{
+  "name": "@apu/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:sepolia": "hardhat run scripts/deploy-sepolia.ts --network sepolia",
+    "deploy:og-testnet": "hardhat run scripts/deploy-og-testnet.ts --network ogGalileo",
+    "deploy:og-mainnet": "hardhat run scripts/deploy-og-mainnet.ts --network ogMainnet",
+    "verify:sepolia": "hardhat verify --network sepolia",
+    "verify:og-testnet": "hardhat verify --network ogGalileo",
+    "verify:og-mainnet": "hardhat verify --network ogMainnet",
+    "check-balance:testnet": "hardhat run scripts/check-balance-testnet.ts --network ogGalileo",
+    "check-balance:mainnet": "hardhat run scripts/check-balance.ts --network ogMainnet"
+  },
+  "devDependencies": {
+    "@fhevm/hardhat-plugin": "^0.4.2",
+    "@fhevm/mock-utils": "^0.4.2",
+    "@fhevm/solidity": "^0.11.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
+    "@nomicfoundation/hardhat-ethers": "^3.1.3",
+    "@nomicfoundation/hardhat-verify": "^2.1.3",
+    "@openzeppelin/confidential-contracts": "^0.5.1",
+    "@openzeppelin/contracts": "^5.6.1",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.19.43",
+    "chai": "^6.2.2",
+    "ethers": "^6.17.0",
+    "hardhat": "^2.29.0",
+    "hardhat-deploy": "^2.0.24",
+    "hardhat-gas-reporter": "^2.3.0",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^5.7.0"
+  }
+}
