@@ -5,10 +5,15 @@ import { useState, useEffect } from "react";
 import { EncryptionVisualizer } from "../components/EncryptionVisualizer";
 import { ArchitectureShowcase } from "../components/ArchitectureShowcase";
 import { Logo } from "../components/ui/Logo";
+import { LanguageToggle } from "../components/ui/LanguageToggle";
+import { Language, useTranslation } from "../lib/i18n";
 
 export default function HomePage() {
   const { ready, authenticated, login, logout, user } = usePrivy();
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [lang, setLang] = useState<Language>('es');
+
+  const t = useTranslation(lang);
 
   useEffect(() => {
     // Check backend status
@@ -27,7 +32,7 @@ export default function HomePage() {
             <span></span>
             <span></span>
           </div>
-          <p className="text-sm font-mono text-apu-tenue">Inicializando conexión segura...</p>
+          <p className="text-sm font-mono text-apu-tenue">{t('status.checking')}</p>
         </div>
       </div>
     );
@@ -45,6 +50,9 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-4 fade-in-delay-1">
+              {/* Language Toggle */}
+              <LanguageToggle currentLang={lang} onLanguageChange={setLang} />
+
               {/* Backend Status - Subtle indicator */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-apu-wash border border-apu-borde">
                 <div className={`w-2 h-2 rounded-full ${
@@ -53,8 +61,8 @@ export default function HomePage() {
                   'bg-apu-tenue'
                 } ${backendStatus === 'online' ? 'animate-pulse' : ''}`} />
                 <span className="text-xs font-mono text-apu-tenue">
-                  {backendStatus === 'online' ? 'Production Ready' :
-                   backendStatus === 'offline' ? 'Sin conexión' : 'Verificando...'}
+                  {backendStatus === 'online' ? t('status.productionReady') :
+                   backendStatus === 'offline' ? t('status.offline') : t('status.checking')}
                 </span>
               </div>
 
@@ -63,14 +71,14 @@ export default function HomePage() {
                   onClick={logout}
                   className="px-5 py-2 bg-apu-wash hover:bg-apu-borde text-apu-ink rounded-lg transition-colors font-medium text-sm"
                 >
-                  Cerrar sesión
+                  {t('nav.logout')}
                 </button>
               ) : (
                 <button
                   onClick={login}
                   className="px-6 py-2 bg-brand-violet hover:bg-brand-pressed text-white rounded-lg transition-all font-medium shadow-md"
                 >
-                  Conectar Wallet
+                  {t('nav.connectWallet')}
                 </button>
               )}
             </div>
@@ -85,7 +93,7 @@ export default function HomePage() {
             {/* Welcome Section - Clean */}
             <div className="fade-in">
               <h2 className="text-4xl font-bold text-apu-ink mb-2">
-                Bienvenido de vuelta
+                {t('welcome.title')}
               </h2>
               <p className="text-apu-tenue font-mono text-sm">
                 {user?.wallet?.address ?
@@ -97,27 +105,27 @@ export default function HomePage() {
             {/* Security Metrics - Professional stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 fade-in-delay-1">
               <div className="p-6 rounded-xl bg-white border border-apu-borde hover:shadow-lg transition-shadow">
-                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">Encriptación</div>
-                <div className="text-3xl font-bold text-brand-violet mb-1">256-bit</div>
-                <p className="text-xs text-apu-tenue">FHE + AES</p>
+                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">{t('metrics.encryption')}</div>
+                <div className="text-3xl font-bold text-brand-violet mb-1">{t('metrics.encryptionValue')}</div>
+                <p className="text-xs text-apu-tenue">{t('metrics.encryptionDesc')}</p>
               </div>
 
               <div className="p-6 rounded-xl bg-white border border-apu-borde hover:shadow-lg transition-shadow">
-                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">TEE Status</div>
-                <div className="text-3xl font-bold text-success mb-1">Verified</div>
-                <p className="text-xs text-apu-tenue">0G Compute</p>
+                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">{t('metrics.tee')}</div>
+                <div className="text-3xl font-bold text-success mb-1">{t('metrics.teeValue')}</div>
+                <p className="text-xs text-apu-tenue">{t('metrics.teeDesc')}</p>
               </div>
 
               <div className="p-6 rounded-xl bg-white border border-apu-borde hover:shadow-lg transition-shadow">
-                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">Uptime</div>
-                <div className="text-3xl font-bold text-brand-violet mb-1">99.9%</div>
-                <p className="text-xs text-apu-tenue">Last 30 days</p>
+                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">{t('metrics.uptime')}</div>
+                <div className="text-3xl font-bold text-brand-violet mb-1">{t('metrics.uptimeValue')}</div>
+                <p className="text-xs text-apu-tenue">{t('metrics.uptimeDesc')}</p>
               </div>
 
               <div className="p-6 rounded-xl bg-white border border-apu-borde hover:shadow-lg transition-shadow">
-                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">Network</div>
-                <div className="text-3xl font-bold text-warning mb-1">Active</div>
-                <p className="text-xs text-apu-tenue">Sepolia + 0G</p>
+                <div className="text-xs font-mono text-apu-tenue uppercase tracking-wider mb-2">{t('metrics.network')}</div>
+                <div className="text-3xl font-bold text-warning mb-1">{t('metrics.networkValue')}</div>
+                <p className="text-xs text-apu-tenue">{t('metrics.networkDesc')}</p>
               </div>
             </div>
 
@@ -133,12 +141,12 @@ export default function HomePage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold text-apu-ink mb-3">Portal de Pacientes</h3>
+                  <h3 className="text-2xl font-bold text-apu-ink mb-3">{t('portal.patient.title')}</h3>
                   <p className="text-apu-tenue leading-relaxed mb-6">
-                    Envía datos médicos encriptados y recibe diagnóstico con IA preservando privacidad total
+                    {t('portal.patient.desc')}
                   </p>
                   <div className="flex items-center gap-2 text-brand-violet font-medium text-sm group-hover:translate-x-2 transition-transform">
-                    <span>Ingresar al portal</span>
+                    <span>{t('portal.patient.cta')}</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -156,12 +164,12 @@ export default function HomePage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold text-apu-ink mb-3">Portal de Médicos</h3>
+                  <h3 className="text-2xl font-bold text-apu-ink mb-3">{t('portal.doctor.title')}</h3>
                   <p className="text-apu-tenue leading-relaxed mb-6">
-                    Revisa diagnósticos, accede a datos médicos encriptados y almacena diagnósticos verificados
+                    {t('portal.doctor.desc')}
                   </p>
                   <div className="flex items-center gap-2 text-success font-medium text-sm group-hover:translate-x-2 transition-transform">
-                    <span>Ingresar al portal</span>
+                    <span>{t('portal.doctor.cta')}</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -179,14 +187,14 @@ export default function HomePage() {
               </div>
 
               <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-apu-ink mb-6 leading-tight">
-                Diagnóstico Médico con IA<br />
+                {t('hero.title')}<br />
                 <span className="text-brand-violet">
-                  Privacidad Absoluta
+                  {t('hero.titleHighlight')}
                 </span>
               </h2>
 
               <p className="text-xl md:text-2xl text-apu-tenue mb-6 leading-relaxed max-w-3xl mx-auto">
-                Primera plataforma de diagnóstico médico con encriptación homomórfica completa y ejecución verificable
+                {t('hero.subtitle')}
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
@@ -205,7 +213,7 @@ export default function HomePage() {
                 onClick={login}
                 className="bg-brand-violet hover:bg-brand-pressed text-white text-lg px-12 py-4 rounded-lg font-semibold hover:scale-105 transform transition-all shadow-xl shadow-brand-violet/30 mb-6"
               >
-                Conectar Wallet para Comenzar
+                {t('hero.cta')}
               </button>
 
               <p className="text-sm text-apu-tenue font-mono">
@@ -217,10 +225,10 @@ export default function HomePage() {
             <div className="fade-in-delay-1">
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-apu-ink mb-2">
-                  Demostración en Vivo
+                  {t('demo.title')}
                 </h3>
                 <p className="text-apu-tenue">
-                  Visualiza cómo funciona la encriptación homomórfica en tiempo real
+                  {t('demo.subtitle')}
                 </p>
               </div>
               <EncryptionVisualizer />
@@ -239,9 +247,9 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-apu-ink mb-3">Zero Knowledge Medical AI</h4>
+                <h4 className="text-xl font-bold text-apu-ink mb-3">{t('value.zkMedical.title')}</h4>
                 <p className="text-apu-tenue leading-relaxed">
-                  Los datos médicos nunca se exponen. La IA realiza diagnósticos sobre datos encriptados usando FHE de Zama.
+                  {t('value.zkMedical.desc')}
                 </p>
               </div>
 
@@ -251,9 +259,9 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-apu-ink mb-3">Verified Execution</h4>
+                <h4 className="text-xl font-bold text-apu-ink mb-3">{t('value.verified.title')}</h4>
                 <p className="text-apu-tenue leading-relaxed">
-                  Toda inferencia de IA corre en 0G Compute TEE con attestation criptográfica verificable on-chain.
+                  {t('value.verified.desc')}
                 </p>
               </div>
 
@@ -263,9 +271,9 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-apu-ink mb-3">Decentralized Storage</h4>
+                <h4 className="text-xl font-bold text-apu-ink mb-3">{t('value.storage.title')}</h4>
                 <p className="text-apu-tenue leading-relaxed">
-                  Registros médicos almacenados encriptados en 0G Storage con alta disponibilidad y redundancia.
+                  {t('value.storage.desc')}
                 </p>
               </div>
             </div>
@@ -273,24 +281,23 @@ export default function HomePage() {
             {/* Impact Statement */}
             <div className="max-w-4xl mx-auto text-center p-12 rounded-2xl bg-gradient-to-br from-brand-violet/5 to-brand-violet/10 border border-brand-violet/20 fade-in-delay-3">
               <h3 className="text-3xl font-bold text-apu-ink mb-4">
-                Construido para el 0G Apollo Accelerator
+                {t('impact.title')}
               </h3>
               <p className="text-lg text-apu-tenue mb-6 leading-relaxed">
-                Sistema de diagnóstico médico que combina encriptación homomórfica completa de Zama con la infraestructura
-                descentralizada de 0G Labs, garantizando privacidad absoluta del paciente en cada etapa del proceso.
+                {t('impact.subtitle')}
               </p>
               <div className="flex items-center justify-center gap-6 text-sm font-mono text-apu-tenue">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span>Production Ready</span>
+                  <span>{t('status.productionReady')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-brand-violet animate-pulse" />
-                  <span>Fully Encrypted</span>
+                  <span>{t('status.fullyEncrypted')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span>TEE Verified</span>
+                  <span>{t('status.teeVerified')}</span>
                 </div>
               </div>
             </div>
@@ -301,18 +308,18 @@ export default function HomePage() {
       {/* Professional Footer */}
       <footer className="relative z-10 border-t border-apu-borde mt-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div className="md:col-span-1">
               <div className="mb-4">
                 <Logo variant="black" width={100} height={33} />
               </div>
               <p className="text-sm text-apu-tenue">
-                Diagnóstico médico con IA preservando privacidad absoluta
+                {t('footer.tagline')}
               </p>
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-apu-ink mb-3">Tecnología</h4>
+              <h4 className="text-sm font-bold text-apu-ink mb-3">{t('footer.tech')}</h4>
               <ul className="space-y-2 text-sm text-apu-tenue">
                 <li><a href="https://www.zama.ai" target="_blank" rel="noopener" className="hover:text-brand-violet transition-colors">Zama FHE</a></li>
                 <li><a href="https://0g.ai" target="_blank" rel="noopener" className="hover:text-brand-violet transition-colors">0G Labs</a></li>
@@ -321,32 +328,22 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-apu-ink mb-3">Programa</h4>
-              <ul className="space-y-2 text-sm text-apu-tenue">
-                <li>0G Apollo Accelerator</li>
-                <li>Batch 2026</li>
-                <li>Medical AI Track</li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-bold text-apu-ink mb-3">Estado</h4>
+              <h4 className="text-sm font-bold text-apu-ink mb-3">{t('footer.status')}</h4>
               <ul className="space-y-2 text-sm text-apu-tenue">
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span>Production Ready</span>
+                  <span>{t('status.productionReady')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-brand-violet animate-pulse" />
-                  <span>Fully Encrypted</span>
+                  <span>{t('status.fullyEncrypted')}</span>
                 </li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 border-t border-apu-borde flex items-center justify-between text-sm text-apu-tenue">
-            <p className="font-mono">© 2026 APU Medical. Built with Zama × 0G Labs</p>
-            <p className="font-mono">0G Apollo Accelerator</p>
+            <p className="font-mono">{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>
